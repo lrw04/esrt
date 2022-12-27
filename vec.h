@@ -39,4 +39,6 @@ v3 operator*(real lhs, const v3& rhs);
 using color = v3;
 using point = v3;
 
+const real eps = 1e-5f;
+
 #endif
