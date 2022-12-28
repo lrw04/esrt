@@ -10,6 +10,7 @@
 #include "interval.h"
 #include "ray.h"
 #include "vec.h"
+#include "material.h"
 
 struct object {
     virtual std::optional<hit> intersect(ray r, interval t) const = 0;
@@ -29,6 +30,14 @@ struct bvh : public object {
     virtual bb bound() const override;
 };
 
-// TODO: everything
+struct triangle : public object {
+    point v[3];
+    std::shared_ptr<material> mat;
+    triangle(point a, point b, point c, std::shared_ptr<material> m);
+    virtual std::optional<hit> intersect(ray r, interval t) const override;
+    virtual bb bound() const override;
+};
+
+// TODO: spheres maybe
 
 #endif

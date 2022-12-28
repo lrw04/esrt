@@ -12,8 +12,9 @@ struct interval {
 
 interval closure(interval a, interval b);
 interval intersection(interval a, interval b);
+bool element_of(real x, interval s);
 
 const interval reals = {-INFINITY, INFINITY};
-const interval empty_interval = {1, 0};
+const interval empty_interval = {INFINITY, -INFINITY};
 
 #endif

@@ -50,3 +50,50 @@ std::optional<hit> empty::intersect(ray r, interval t) const {
 }
 
 bb empty::bound() const { return empty_box; }
+
+triangle::triangle(point a, point b, point c, std::shared_ptr<material> m) {
+    v[0] = a;
+    v[1] = b;
+    v[2] = c;
+    mat = m;
+}
+
+std::optional<hit> triangle::intersect(ray r, interval t) const {
+    auto a = v[0][0] - v[1][0], d = v[0][0] - v[2][0], g = r.d[0];
+    auto b = v[0][1] - v[1][1], e = v[0][1] - v[2][1], h = r.d[1];
+    auto c = v[0][2] - v[1][2], f = v[0][2] - v[2][2], i = r.d[2];
+    auto j = v[0][0] - r.o[0], k = v[0][1] - r.o[1], l = v[0][2] - r.o[2];
+
+    auto ei_hf = e * i - h * f, gf_di = g * f - d * i, dh_eg = d * h - e * g;
+    auto ak_jb = a * k - j * b, jc_al = j * c - a * l, bl_kc = b * l - k * c;
+    auto m = a * ei_hf + b * gf_di + c * dh_eg;
+    if (abs(m) < eps) return std::nullopt;
+
+    auto beta = (j * ei_hf + k * gf_di + l * dh_eg) / m;
+    auto gamma = (i * ak_jb + h * jc_al + g * bl_kc) / m;
+    auto t_hit = -(f * ak_jb + e * jc_al + d * bl_kc) / m;
+
+    if (!element_of(t_hit, t)) return std::nullopt;
+    if (beta > 0 && gamma > 0 && beta + gamma < 1) {
+        hit h;
+        h.mat = mat;
+        h.n = (v[0] - v[1]).cross(v[1] - v[2]);
+        if (h.n.dot(r.d) > 0) h.n *= -1;
+        h.p = r(t_hit);
+        h.u = beta;
+        h.v = gamma;
+        return h;
+    }
+    return std::nullopt;
+}
+
+bb triangle::bound() const {
+    bb box = r3;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < dim; j++) {
+            box[j].l = std::min(box[j].l, v[i][j]);
+            box[j].r = std::max(box[j].r, v[i][j]);
+        }
+    }
+    return box;
+}

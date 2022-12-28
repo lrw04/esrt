@@ -15,3 +15,5 @@ interval closure(interval a, interval b) {
 interval intersection(interval a, interval b) {
     return {std::max(a.l, b.l), std::min(a.r, b.r)};
 }
+
+bool element_of(real x, interval s) { return s.l < x && x < s.r; }
