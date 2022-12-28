@@ -54,3 +54,7 @@ real v3::len() const { return sqrt(this->l2()); }
 
 v3 v3::normalized() const { return (*this) / this->len(); }
 v3 v3::make_length(real l) const { return this->normalized() * l; }
+
+v3 v3::operator*(const v3& rhs) const {
+    return {d[0] * rhs[0], d[1] * rhs[1], d[2] * rhs[2]};
+}

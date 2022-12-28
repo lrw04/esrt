@@ -1,18 +1,21 @@
 #include "camera.h"
 #include "image.h"
+#include "material.h"
 #include "rng.h"
 #include "scene.h"
 
 // TODO: build in-memory representation of object
-// TODO: calculate colors properly
 // TODO: monte-carlo
 
 color pixel_color(std::shared_ptr<object> obj, const ray& r, unsigned depth) {
     if (!depth) return {};
     auto h = obj->intersect(r, {eps, INFINITY});
     if (!h.has_value()) return {};  // TODO: skybox
-    // TODO
-    return {};
+    auto sc = h.value().mat->scattered(r, h.value());
+    if (!sc.has_value())
+        return h.value().mat->emitted(h.value().u, h.value().v, h.value().p);
+    return h.value().mat->emitted(h.value().u, h.value().v, h.value().p) +
+           sc.value().attenuation * pixel_color(obj, sc.value().out, depth - 1);
 }
 
 image render(std::shared_ptr<object> obj, const camera& cam, std::size_t w,
@@ -37,12 +40,5 @@ image render(std::shared_ptr<object> obj, const camera& cam, std::size_t w,
 }
 
 int main() {
-    const int imh = 100, imw = 100;
-    image im(imh, imw);
-    for (int y = 0; y < imh; y++) {
-        for (int x = 0; x < imw; x++) {
-            im(y, x) = {(real)y / imh, (real)x / imw, 0};
-        }
-    }
-    im.write_png("image.png");
+    // TODO: interface
 }

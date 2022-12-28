@@ -33,6 +33,7 @@ struct v3 {
     real len() const;
     v3 normalized() const;
     v3 make_length(real l) const;
+    v3 operator*(const v3& rhs) const;
 };
 
 v3 operator*(real lhs, const v3& rhs);
