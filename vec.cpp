@@ -3,7 +3,7 @@
 #include <cmath>
 
 v3::v3(real val) {
-    for (int i = 0; i < 3; i++) d[i] = val;
+    for (int i = 0; i < dim; i++) d[i] = val;
 }
 
 v3::v3(real x, real y, real z) {

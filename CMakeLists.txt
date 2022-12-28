@@ -9,5 +9,5 @@ Set(FETCHCONTENT_QUIET FALSE)
 add_subdirectory(stb_image_write)
 add_subdirectory(stb_image)
 
-add_executable(esrt main.cpp vec.cpp ray.cpp image.cpp scene.cpp interval.cpp bb.cpp stb_image_write_impl.cpp stb_image_impl.cpp)
+add_executable(esrt camera.cpp hit.cpp main.cpp vec.cpp ray.cpp image.cpp scene.cpp interval.cpp bb.cpp rng.cpp material.cpp stb_image_write_impl.cpp stb_image_impl.cpp)
 target_link_libraries(esrt stb_image_write stb_image)

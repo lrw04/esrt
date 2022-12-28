@@ -3,7 +3,7 @@
 #include <algorithm>
 
 bool bb::nonempty() const {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < dim; i++) {
         if (!d[i].nonempty()) return false;
     }
     return true;
@@ -12,9 +12,9 @@ bool bb::nonempty() const {
 interval& bb::operator[](std::size_t i) { return d[i]; }
 interval bb::operator[](std::size_t i) const { return d[i]; }
 
-std::optional<hit> bb::hit(ray r, interval t) const {
+std::optional<hit> bb::intersect(ray r, interval t) const {
     interval t_in = {eps, INFINITY};
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < dim; i++) {
         // r.o[i] + x * r.d[i] = d[i].l
         interval cur = {(d[i].l - r.o[i]) / r.d[i], (d[i].r - r.o[i]) / r.d[i]};
         if (!cur.nonempty()) std::swap(cur.l, cur.r);
@@ -24,14 +24,14 @@ std::optional<hit> bb::hit(ray r, interval t) const {
     return std::nullopt;
 }
 
-bb bound(const bb& a, const bb& b) {
+bb closure(const bb& a, const bb& b) {
     bb out;
-    for (int i = 0; i < 3; i++) out[i] = bound(a[i], b[i]);
+    for (int i = 0; i < dim; i++) out[i] = closure(a[i], b[i]);
     return out;
 }
 
 bb intersection(const bb& a, const bb& b) {
     bb out;
-    for (int i = 0; i < 3; i++) out[i] = intersection(a[i], b[i]);
+    for (int i = 0; i < dim; i++) out[i] = intersection(a[i], b[i]);
     return out;
 }

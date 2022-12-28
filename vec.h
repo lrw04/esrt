@@ -4,9 +4,10 @@
 #include <cstddef>
 
 using real = float;
+const int dim = 3;
 
 struct v3 {
-    real d[3];
+    real d[dim];
     v3(real val = 0);
     v3(real x, real y, real z);
     real& x();

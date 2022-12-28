@@ -1,7 +1,9 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <memory>
 #include <optional>
+#include <vector>
 
 #include "bb.h"
 #include "hit.h"
@@ -14,9 +16,19 @@ struct object {
     virtual bb bound() const = 0;
 };
 
-struct bvh : public object {
+struct empty : public object {
     virtual std::optional<hit> intersect(ray r, interval t) const override;
     virtual bb bound() const override;
 };
+
+struct bvh : public object {
+    std::shared_ptr<object> lc, rc;
+    bb box;
+    bvh(const std::vector<std::shared_ptr<object>>& objects, int axis = 0);
+    virtual std::optional<hit> intersect(ray r, interval t) const override;
+    virtual bb bound() const override;
+};
+
+// TODO: everything
 
 #endif
