@@ -6,6 +6,7 @@
 struct ray {
     point o;
     v3 d;
+    ray() {}
     ray(point o, v3 d) : o(o), d(d) {}
     point operator()(real t) const;
 };

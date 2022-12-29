@@ -10,6 +10,8 @@
 
 struct bb {
     interval d[dim];
+    bb(interval a = {}, interval b = {}, interval c = {});
+    bb(point a, point b);
     bool nonempty() const;
     interval& operator[](std::size_t i);
     interval operator[](std::size_t i) const;

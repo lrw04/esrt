@@ -38,6 +38,13 @@ struct triangle : public object {
     virtual bb bound() const override;
 };
 
-// TODO: spheres maybe
+struct sphere : public object {
+    point o;
+    real rd;
+    std::shared_ptr<material> mat;
+    sphere(point o_, real r_, std::shared_ptr<material> m);
+    virtual std::optional<hit> intersect(ray r, interval t) const override;
+    virtual bb bound() const override;
+};
 
 #endif

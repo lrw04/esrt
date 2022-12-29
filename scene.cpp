@@ -97,3 +97,31 @@ bb triangle::bound() const {
     }
     return box;
 }
+
+sphere::sphere(point o_, real r_, std::shared_ptr<material> m) {
+    o = o_;
+    rd = r_;
+    mat = m;
+}
+
+std::optional<hit> sphere::intersect(ray r, interval t) const {
+    auto a = r.d.l2(), b = 2 * r.d.dot(r.o - o), c = (r.o - o).l2() - rd * rd;
+    auto delta = b * b - 4 * a * c;
+    if (delta <= 0) return std::nullopt;
+    real t_hit = INFINITY;
+    for (int sign = -1; sign <= 1; sign += 2) {
+        auto t_cur = (-b + sign * sqrt(delta)) / (2 * a);
+        if (element_of(t_cur, t)) t_hit = std::min(t_hit, t_cur);
+    }
+    if (t_hit == INFINITY) return std::nullopt;
+    hit h;
+    h.mat = mat;
+    h.n = r(t_hit) - o;
+    h.p = r(t_hit);
+    h.t = t_hit;
+    h.u = (atan2((h.p - o)[2], (h.p - o)[0]) + pi) / (2 * pi);
+    h.v = (asin((h.p - o)[1]) + pi / 2) / pi;
+    return h;
+}
+
+bb sphere::bound() const { return bb(o - v3(rd, rd, rd), o + v3(rd, rd, rd)); }

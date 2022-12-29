@@ -42,5 +42,6 @@ using color = v3;
 using point = v3;
 
 const real eps = 1e-5f;
+const real pi = acos(-1);
 
 #endif

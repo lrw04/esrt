@@ -2,6 +2,16 @@
 
 #include <algorithm>
 
+bb::bb(interval a, interval b, interval c) {
+    d[0] = a;
+    d[1] = b;
+    d[2] = c;
+}
+
+bb::bb(point a, point b) {
+    for (int i = 0; i < dim; i++) d[i] = {a[i], b[i]};
+}
+
 bool bb::nonempty() const {
     for (int i = 0; i < dim; i++) {
         if (!d[i].nonempty()) return false;
