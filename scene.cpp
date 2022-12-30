@@ -38,7 +38,7 @@ bvh::bvh(const std::vector<std::shared_ptr<object>>& objects, int axis) {
 }
 
 std::optional<hit> bvh::intersect(ray r, interval t) const {
-    if (box.intersect(r, t).has_value())
+    if (box.intersect(r, t))
         return lc->intersect(r, t) ^ rc->intersect(r, t);
     return std::nullopt;
 }
@@ -105,12 +105,15 @@ sphere::sphere(point o_, real r_, std::shared_ptr<material> m) {
 }
 
 std::optional<hit> sphere::intersect(ray r, interval t) const {
-    auto a = r.d.l2(), b = 2 * r.d.dot(r.o - o), c = (r.o - o).l2() - rd * rd;
+    auto dif = r.o - o;
+    auto a = r.d.l2(), b = 2 * r.d.dot(dif), c = dif.l2() - rd * rd;
     auto delta = b * b - 4 * a * c;
     if (delta <= 0) return std::nullopt;
     real t_hit = INFINITY;
+    auto mid = -b / (2 * a);
+    auto d = sqrt(delta) / (2 * a);
     for (int sign = -1; sign <= 1; sign += 2) {
-        auto t_cur = (-b + sign * sqrt(delta)) / (2 * a);
+        auto t_cur = mid + sign * d;
         if (element_of(t_cur, t)) t_hit = std::min(t_hit, t_cur);
     }
     if (t_hit == INFINITY) return std::nullopt;

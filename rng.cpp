@@ -28,3 +28,12 @@ v3 uniform_unit_sphere() {
         return v.normalized();
     }
 }
+
+v3 uniform_in_unit_sphere() {
+    v3 v;
+    while (true) {
+        v = {uniform_real(-1, 1), uniform_real(-1, 1), uniform_real(-1, 1)};
+        if (v.len() > 1) continue;
+        return v;
+    }
+}

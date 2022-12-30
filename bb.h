@@ -15,7 +15,7 @@ struct bb {
     bool nonempty() const;
     interval& operator[](std::size_t i);
     interval operator[](std::size_t i) const;
-    std::optional<hit> intersect(ray r, interval t) const;
+    bool intersect(ray r, interval t) const;
 };
 
 bb closure(const bb& a, const bb& b);

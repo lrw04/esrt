@@ -1,44 +1,32 @@
-#include "camera.h"
-#include "image.h"
-#include "material.h"
-#include "rng.h"
-#include "scene.h"
+#include <cstring>
+#include <fstream>
+#include <iostream>
 
-// TODO: build in-memory representation of object
-// TODO: monte-carlo
+#include "scripting.h"
 
-color pixel_color(std::shared_ptr<object> obj, const ray& r, unsigned depth) {
-    if (!depth) return {};
-    auto h = obj->intersect(r, {eps, INFINITY});
-    if (!h.has_value()) return {};  // TODO: skybox
-    auto sc = h.value().mat->scattered(r, h.value());
-    if (!sc.has_value())
-        return h.value().mat->emitted(h.value().u, h.value().v, h.value().p);
-    return h.value().mat->emitted(h.value().u, h.value().v, h.value().p) +
-           sc.value().attenuation * pixel_color(obj, sc.value().out, depth - 1);
-}
+// TODO: monte-carlo with better PDF
 
-image render(std::shared_ptr<object> obj, const camera& cam, std::size_t w,
-             unsigned samples, unsigned max_depth, real gamma) {
-    std::size_t h = (std::size_t)(w / cam.aspect_ratio);
-    image im(h, w);
-    for (std::size_t y = 0; y < h; y++) {
-        for (std::size_t x = 0; x < w; x++) {
-            im(y, x) = {};
-            for (unsigned i = 0; i < samples; i++) {
-                im(y, x) += pixel_color(
-                    obj,
-                    cam((y + uniform_real()) / h, (x + uniform_real()) / w),
-                    max_depth);
+int main(int argc, char** argv) {
+    if (argc == 1) {
+        std::cerr << "No script specified.\n";
+        return 1;
+    }
+    for (int i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "--")) {
+            std::cerr << "Executing stdin.\n";
+            if (!execute_script(std::cin)) {
+                std::cerr << "Execution failed.\n";
             }
-            for (int i = 0; i < dim; i++) {
-                im(y, x)[i] = pow(im(y, x)[i] / samples, 1 / gamma);
+        } else {
+            std::ifstream st(argv[i]);
+            if (!st) {
+                std::cerr << "Failed to open file " << argv[i] << ".\n";
+                return 2;
+            }
+            std::cerr << "Executing " << argv[i] << ".\n";
+            if (!execute_script(st)) {
+                std::cerr << "Execution failed.\n";
             }
         }
     }
-    return im;
-}
-
-int main() {
-    // TODO: interface
 }
