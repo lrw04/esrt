@@ -5,6 +5,7 @@
 #include "scripting.h"
 
 // TODO: monte-carlo with better PDF
+// TODO: write another data-oriented, lower-level version
 
 int main(int argc, char** argv) {
     if (argc == 1) {
