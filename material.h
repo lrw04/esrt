@@ -13,11 +13,11 @@ struct scatter {
 };
 
 struct texture {
-    virtual color value(real u, real v, point p) const = 0;
+    virtual color value(real u, real v, const point& p) const = 0;
 };
 
 struct material {
-    virtual color emitted(real u, real v, point p) const { return {}; }
+    virtual color emitted(real u, real v, const point& p) const { return {}; }
     virtual std::optional<scatter> scattered(const ray& r,
                                              const hit& h) const = 0;
 };
@@ -25,7 +25,7 @@ struct material {
 struct solid_color : public texture {
     color c;
     solid_color(const color& c) : c(c) {}
-    virtual color value(real u, real v, point p) const override;
+    virtual color value(real u, real v, const point& p) const override;
 };
 
 struct lambertian : public material {
@@ -38,7 +38,7 @@ struct lambertian : public material {
 struct diffuse_light : public material {
     std::shared_ptr<texture> emission;
     diffuse_light(std::shared_ptr<texture> emission) : emission(emission) {}
-    virtual color emitted(real u, real v, point p) const override;
+    virtual color emitted(real u, real v, const point& p) const override;
     virtual std::optional<scatter> scattered(const ray& r,
                                              const hit& h) const override;
 };

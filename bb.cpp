@@ -23,6 +23,7 @@ interval& bb::operator[](std::size_t i) { return d[i]; }
 interval bb::operator[](std::size_t i) const { return d[i]; }
 
 bool bb::intersect(ray r, interval t) const {
+    if (!nonempty()) return false;
     for (int i = 0; i < dim; i++) {
         // r.o[i] + x * r.d[i] = d[i].l
         if (abs(r.d[i]) < eps) {
@@ -49,7 +50,7 @@ bb intersection(const bb& a, const bb& b) {
     return out;
 }
 
-bool element_of(v3 v, const bb& b) {
+bool element_of(const v3& v, const bb& b) {
     for (int i = 0; i < dim; i++) {
         if (!element_of(v[i], b[i])) return false;
     }

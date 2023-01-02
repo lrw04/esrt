@@ -10,9 +10,9 @@ struct interval {
     bool nonempty() const;
 };
 
-interval closure(interval a, interval b);
-interval intersection(interval a, interval b);
-bool element_of(real x, interval s);
+interval closure(const interval& a, const interval& b);
+interval intersection(const interval& a, const interval& b);
+bool element_of(real x, const interval& s);
 
 const interval reals = {-INFINITY, INFINITY};
 const interval empty_interval = {INFINITY, -INFINITY};

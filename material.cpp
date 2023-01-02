@@ -2,18 +2,18 @@
 
 #include "rng.h"
 
-color solid_color::value(real u, real v, point p) const { return c; }
+color solid_color::value(real u, real v, const point& p) const { return c; }
 
 std::optional<scatter> lambertian::scattered(const ray& r, const hit& h) const {
-    auto dir = h.n.normalized() + uniform_unit_sphere();
-    if (dir.len() < eps) dir = h.n.normalized();
+    auto dir = h.n + uniform_unit_sphere();
+    if (dir.len() < eps) dir = h.n;
     scatter sc;
     sc.attenuation = albedo->value(h.u, h.v, h.p);
     sc.out = ray(h.p, dir);
     return sc;
 }
 
-color diffuse_light::emitted(real u, real v, point p) const {
+color diffuse_light::emitted(real u, real v, const point& p) const {
     return emission->value(u, v, p);
 }
 
@@ -30,6 +30,6 @@ reflective::reflective(std::shared_ptr<texture> alb, real fuz) {
 std::optional<scatter> reflective::scattered(const ray& r, const hit& h) const {
     scatter sc;
     sc.attenuation = albedo->value(h.u, h.v, h.p);
-    sc.out = ray(h.p, r.d - 2 * (r.d.dot(h.n.normalized())) * h.n.normalized());
+    sc.out = ray(h.p, r.d - 2 * (r.d.dot(h.n)) * h.n);
     return sc;
 }

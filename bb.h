@@ -20,7 +20,7 @@ struct bb {
 
 bb closure(const bb& a, const bb& b);
 bb intersection(const bb& a, const bb& b);
-bool element_of(v3 v, const bb& b);
+bool element_of(const v3& v, const bb& b);
 
 const bb r3 = {reals, reals, reals};
 const bb empty_box = {empty_interval, empty_interval, empty_interval};

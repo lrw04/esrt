@@ -23,21 +23,19 @@ bvh::bvh(const std::vector<std::shared_ptr<object>>& objects, int axis) {
         return;
     }
     auto a = objects;
-    auto pivot = uniform_int((size_t)0, a.size() - 1);
-    real val = a[pivot]->bound()[axis].l;
-    auto middle = std::partition(a.begin(), a.end(),
-                                 [val, axis](std::shared_ptr<object> p) {
-                                     return p->bound()[axis].l < val;
-                                 });
+    std::sort(a.begin(), a.end(), [axis](std::shared_ptr<object> a, std::shared_ptr<object> b) {
+        return a->bound()[axis].l < b->bound()[axis].l;
+    });
+    auto middle = uniform_int(0, a.size() - 1);
     std::vector<std::shared_ptr<object>> l, r;
-    for (auto it = a.begin(); it != middle; it++) l.push_back(*it);
-    for (auto it = middle; it != a.end(); it++) r.push_back(*it);
+    for (std::size_t i = 0; i < middle; i++) l.push_back(a[i]);
+    for (std::size_t i = middle; i < a.size(); i++) r.push_back(a[i]);
     lc = std::make_shared<bvh>(l, (axis + 1) % dim);
     rc = std::make_shared<bvh>(r, (axis + 2) % dim);
     box = closure(lc->bound(), rc->bound());
 }
 
-std::optional<hit> bvh::intersect(ray r, interval t) const {
+std::optional<hit> bvh::intersect(const ray& r, const interval& t) const {
     if (box.intersect(r, t))
         return lc->intersect(r, t) ^ rc->intersect(r, t);
     return std::nullopt;
@@ -45,7 +43,7 @@ std::optional<hit> bvh::intersect(ray r, interval t) const {
 
 bb bvh::bound() const { return box; }
 
-std::optional<hit> empty::intersect(ray r, interval t) const {
+std::optional<hit> empty::intersect(const ray& r, const interval& t) const {
     return std::nullopt;
 }
 
@@ -58,7 +56,7 @@ triangle::triangle(point a, point b, point c, std::shared_ptr<material> m) {
     mat = m;
 }
 
-std::optional<hit> triangle::intersect(ray r, interval t) const {
+std::optional<hit> triangle::intersect(const ray& r, const interval& t) const {
     auto a = v[0][0] - v[1][0], d = v[0][0] - v[2][0], g = r.d[0];
     auto b = v[0][1] - v[1][1], e = v[0][1] - v[2][1], h = r.d[1];
     auto c = v[0][2] - v[1][2], f = v[0][2] - v[2][2], i = r.d[2];
@@ -77,8 +75,9 @@ std::optional<hit> triangle::intersect(ray r, interval t) const {
     if (beta > 0 && gamma > 0 && beta + gamma < 1) {
         hit h;
         h.mat = mat;
-        h.n = (v[0] - v[1]).cross(v[1] - v[2]);
+        h.n = (v[0] - v[1]).cross(v[1] - v[2]).normalized();
         if (h.n.dot(r.d) > 0) h.n *= -1;
+        h.t = t_hit;
         h.p = r(t_hit);
         h.u = beta;
         h.v = gamma;
@@ -104,7 +103,7 @@ sphere::sphere(point o_, real r_, std::shared_ptr<material> m) {
     mat = m;
 }
 
-std::optional<hit> sphere::intersect(ray r, interval t) const {
+std::optional<hit> sphere::intersect(const ray& r, const interval& t) const {
     auto dif = r.o - o;
     auto a = r.d.l2(), b = 2 * r.d.dot(dif), c = dif.l2() - rd * rd;
     auto delta = b * b - 4 * a * c;
@@ -119,7 +118,7 @@ std::optional<hit> sphere::intersect(ray r, interval t) const {
     if (t_hit == INFINITY) return std::nullopt;
     hit h;
     h.mat = mat;
-    h.n = r(t_hit) - o;
+    h.n = (r(t_hit) - o).normalized();
     h.p = r(t_hit);
     h.t = t_hit;
     h.u = (atan2((h.p - o)[2], (h.p - o)[0]) + pi) / (2 * pi);

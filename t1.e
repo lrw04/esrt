@@ -26,10 +26,11 @@ v 0 -1000 0
 o sphere -1 1000 0
 v 0 3000 0
 o sphere -1 1000 -1
-o union 5 2 3 4 e
+o union 0 1 2 3 4 e
 v 0 1 3
 v 0 1 0
 v 0 0 -1
 c origin -3 up -2 direction -1 aspect-ratio 1 fov 120d e
 r object -1 camera -1 width 1024 samples 128 max-depth 8 gamma 2 png-out image-128.png e
+e
 r object -1 camera -1 width 1024 samples 4096 max-depth 8 gamma 2 png-out image-4096.png e

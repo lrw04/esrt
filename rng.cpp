@@ -19,21 +19,11 @@ int64_t uniform_int(int64_t l, int64_t r) {
 
 bool event_with_probability(real p) { return uniform_real() < p; }
 
-// TODO: optimize
 v3 uniform_unit_sphere() {
-    v3 v;
-    while (true) {
-        v = {uniform_real(-1, 1), uniform_real(-1, 1), uniform_real(-1, 1)};
-        if (v.len() > 1) continue;
-        return v.normalized();
-    }
+    real theta = uniform_real(0, 2 * pi), phi = acos(uniform_real(-1, 1));
+    return {cos(theta) * sin(phi), cos(phi), sin(theta) * sin(phi)};
 }
 
 v3 uniform_in_unit_sphere() {
-    v3 v;
-    while (true) {
-        v = {uniform_real(-1, 1), uniform_real(-1, 1), uniform_real(-1, 1)};
-        if (v.len() > 1) continue;
-        return v;
-    }
+    return uniform_unit_sphere() * pow(uniform_real(), 1.0 / 3.0);
 }

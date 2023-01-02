@@ -100,7 +100,16 @@ bool execute_script(std::istream& st) {
                 std::string k;
                 while (st >> k) {
                     if (k == "e") break;
-                    children.push_back(cyclic_access(objects, std::stoi(k)));
+                    auto pos = k.find('~');
+                    if (pos != std::string::npos) {
+                        auto from = std::stoll(k.substr(0, pos));
+                        auto to = std::stoll(k.substr(pos + 1));
+                        for (auto i = from; i <= to; i++)
+                            children.push_back(cyclic_access(objects, i));
+                    } else {
+                        children.push_back(
+                            cyclic_access(objects, std::stoi(k)));
+                    }
                 }
                 objects.push_back(std::make_shared<bvh>(children));
             } else {
@@ -145,6 +154,10 @@ bool execute_script(std::istream& st) {
 
             auto im = render(obj, cam, w, samples, max_depth, gamma);
             im.write_png(param["png-out"]);
+            continue;
+        }
+        if (t == "#") {
+            st >> t;
             continue;
         }
         return false;
